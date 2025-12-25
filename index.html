@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aşkımızın 7 Günü - Advent Takvimi</title>
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        /* Reset & Base */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #1a0b0b; /* Dark romantic red/black base */
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow-x: hidden;
+            color: #fff;
+            position: relative;
+        }
+
+        /* Background Animation */
+        .bg-animation {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1;
+            background: radial-gradient(circle at center, #5e0a0a 0%, #1a0505 100%);
+            overflow: hidden;
+        }
+        .snowflake, .heart-bg {
+            position: absolute;
+            top: -10%;
+            color: rgba(255, 255, 255, 0.1);
+            animation: fall linear infinite;
+        }
+        .heart-bg { color: rgba(255, 0, 50, 0.1); font-size: 2rem; }
+        @keyframes fall {
+            to { transform: translateY(110vh) rotate(360deg); }
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            margin-bottom: 50px;
+            z-index: 10;
+            padding: 20px;
+        }
+        h1 {
+            font-family: 'Great Vibes', cursive;
+            font-size: 4rem;
+            color: #ff3366;
+            text-shadow: 0 0 20px rgba(255, 51, 102, 0.5);
+            margin-bottom: 10px;
+        }
+        p.subtitle {
+            font-size: 1.2rem;
+            color: #ffcccc;
+            letter-spacing: 2px;
+        }
+
+        /* Grid */
+        .calendar-container {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+            max-width: 1200px;
+            padding: 20px;
+            z-index: 10;
+        }
+
+        /* Gift Box Card */
+        .gift-card {
+            width: 180px;
+            height: 220px;
+            perspective: 1000px;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .gift-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform-style: preserve-3d;
+        }
+
+        .gift-card.opened .gift-card-inner {
+            transform: rotateY(180deg);
+        }
+
+        .gift-card.locked {
+            filter: grayscale(0.8);
+            cursor: not-allowed;
+        }
+
+        /* Front of Card (The Box) */
+        .gift-front, .gift-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .gift-front {
+            background: linear-gradient(135deg, #d60000 0%, #900000 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border: 2px solid #ffcc00;
+        }
+
+        /* Ribbon CSS */
+        .ribbon-vertical {
+            position: absolute;
+            width: 20px;
+            height: 100%;
+            background: #ffcc00;
+            left: 50%;
+            transform: translateX(-50%);
+            box-shadow: 0 0 10px rgba(0,0,0,0.3);
+        }
+        .ribbon-horizontal {
+            position: absolute;
+            height: 20px;
+            width: 100%;
+            background: #ffcc00;
+            top: 50%;
+            transform: translateY(-50%);
+            box-shadow: 0 0 10px rgba(0,0,0,0.3);
+        }
+        .bow {
+            position: absolute;
+            top: 35%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 3rem;
+            color: #ffcc00;
+            z-index: 2;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.5);
+        }
+
+        .day-number {
+            position: absolute;
+            bottom: 20px;
+            font-size: 2rem;
+            font-weight: bold;
+            color: white;
+            z-index: 2;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            font-family: 'Great Vibes', cursive;
+        }
+
+        /* Back of Card (The Reveal Preview) */
+        .gift-back {
+            background: #fff;
+            color: #333;
+            transform: rotateY(180deg);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            border: 4px solid #d60000;
+        }
+
+        .gift-back h3 {
+            color: #d60000;
+            font-family: 'Great Vibes', cursive;
+            font-size: 2.4rem;
+            margin-bottom: 10px;
+        }
+        .gift-back button {
+            padding: 12px 30px;
+            background: #d60000;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: transform 0.2s;
+        }
+        .gift-back button:hover {
+            transform: scale(1.1);
+        }
+
+        .gift-icon {
+            font-size: 2rem;
+            margin: 10px 0;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s;
+        }
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .modal-content {
+            background: white;
+            width: 90%;
+            max-width: 500px;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            position: relative;
+            transform: scale(0.7);
+            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            color: #333;
+            box-shadow: 0 0 50px rgba(255, 51, 102, 0.3);
+        }
+        .modal-overlay.active .modal-content {
+            transform: scale(1);
+        }
+        .close-modal {
+            position: absolute;
+            top: 15px; right: 15px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #999;
+        }
+        .modal-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            animation: bounce 2s infinite;
+        }
+        .modal-text {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @media (max-width: 600px) {
+            h1 { font-size: 2.5rem; }
+            .gift-card { width: 140px; height: 180px; }
+            
+            /* Mobile adjustments for inner content */
+            .gift-back { padding: 5px; }
+            .gift-back h3 { font-size: 1.7rem; margin-bottom: 5px; }
+            .gift-icon { font-size: 1.5rem; margin: 5px 0 10px 0; }
+            .gift-back button { padding: 12px 0; font-size: 1.1rem; width: 90%; }
+            .modal-text { font-size: 1.4rem; line-height: 1.5; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bg-animation" id="bgAnimation"></div>
+
+    <header>
+        <h1>❤️ Kehribar Gözlüme ❤️ </h1>
+        <p class="subtitle">7 Günlük Aşk Takvimi</p>
+        <p style="margin-top:10px; font-size:0.9rem; color:#ff9999;">Her gün yeni bir sürpriz seni bekliyor Hatunum! Sabırlı ol ve aşkımızın tadını çıkar. 💖</p>
+        <p style="margin-top:5px; font-size:0.9rem; color:#ff6666;">Açılmayan günler için sabırlı ol, <br> her şey zamanında güzel! 🌹</p>
+        <p style="margin-top:5px; font-size:0.9rem; color:#ff6666;">Sana var ya içim gidiyor içimmm 😉</p>
+        <p style="margin-top:5px; font-size:0.9rem; color:#ff6666;">Seni çok seviyorum çookkk! 💕</p>
+        <p style="margin-top:5px; font-size:0.9rem; color:#ff6666;"> Evlenicez Bitanemmm💖</p>
+        <p style="margin-top:5px; font-size:0.9rem; color:#ff6666;">Üzümlü Kekinden/Tosbikinden sevgilerle... 😘</p>
+    </header>
+
+    <div class="calendar-container" id="calendarGrid">
+        <!-- JS will inject cards here -->
+    </div>
+
+    <div class="modal-overlay" id="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal()">×</span>
+            <div class="modal-icon" id="modalIcon">❤️</div>
+            <h2 id="modalTitle" style="color: #d60000; font-family: 'Great Vibes', cursive; font-size: 2.5rem; margin-bottom: 15px;">Başlık</h2>
+            <p class="modal-text" id="modalText">Mesaj buraya gelecek...</p>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        // Başlangıç tarihi olarak bugünü alıyoruz (Saat 00:00'a sıfırlanmış)
+        const startDate = new Date(); 
+        startDate.setHours(0, 0, 0, 0);
+        
+        const days = [
+            {
+                id: 1,
+                icon: "🌹",
+                title: "İlk Gün",
+                message: "Seninle başlayan her gün, hayatımın en güzel hediyesi. Varlığın için teşekkür ederim sevgilim. ❤️"
+            },
+            {
+                id: 2,
+                icon: "🍫",
+                title: "Tatlı Anlar",
+                message: "Hayatıma kattığın tat, en sevdiğim çikolatadan bile daha güzel. Gülüşünle dünyamı aydınlatıyorsun. ✨"
+            },
+            {
+                id: 3,
+                icon: "🎵",
+                title: "Bizim Şarkımız",
+                message: "Kalbim senin ritminle atıyor. Senin sesin benim en sevdiğim melodi. Seni çok seviyorum! 🎶"
+            },
+            {
+                id: 4,
+                icon: "💌",
+                title: "Sana Notum",
+                message: "Mesafeler ne olursa olsun, kalbim hep senin yanında. Sen benim en güvenli limanımsın. 💑"
+            },
+            {
+                id: 5,
+                icon: "📸",
+                title: "Güzel Anılar",
+                message: "Birlikte biriktirdiğimiz her anı benim için paha biçilemez. Daha nice güzel anılarımıza! 🖼️"
+            },
+            {
+                id: 6,
+                icon: "💍",
+                title: "Sözüm Söz",
+                message: "Seni her zaman seveceğime, her zorlukta yanında olacağıma söz veriyorum. 💖"
+            },
+            {
+                id: 7,
+                icon: "🎁",
+                title: "Büyük Sürpriz",
+                message: "En büyük hediye sensin! Seninle geçecek nice mutlu yıllara, nice güzel anılara... İyi ki varsın! 🎄❤️"
+            }
+        ];
+
+        const openedDays = JSON.parse(localStorage.getItem('openedDays_v2') || '[]');
+
+        function init() {
+            const grid = document.getElementById('calendarGrid');
+            const bg = document.getElementById('bgAnimation');
+            
+            // Bugünün tarihi (karşılaştırma için)
+            const now = new Date();
+
+            // Create Background Elements
+            for(let i=0; i<50; i++) {
+                const el = document.createElement('div');
+                el.classList.add(Math.random() > 0.5 ? 'snowflake' : 'heart-bg');
+                el.innerHTML = Math.random() > 0.5 ? '❄' : '❤';
+                el.style.left = Math.random() * 100 + '%';
+                el.style.animationDuration = (Math.random() * 5 + 5) + 's';
+                el.style.opacity = Math.random() * 0.5;
+                el.style.fontSize = (Math.random() * 20 + 10) + 'px';
+                bg.appendChild(el);
+            }
+
+            
+            // Create Cards
+            days.forEach((day, index) => {
+                const card = document.createElement('div');
+                card.className = 'gift-card';
+                
+                // Kilit Mantığı
+                // Her gün için kilit açılma tarihini hesapla
+                const unlockDate = new Date(startDate);
+                unlockDate.setDate(startDate.getDate() + index); // index 0 ise bugün, 1 ise yarın...
+                unlockDate.setHours(0, 0, 0, 0); // Gece 00:00
+
+                // Kilitleri kaldırdık
+                const isLocked = false;
+
+                // Kilitli ise üzerine kilit ikonu ekleyelim
+                let lockHtml = '';
+                if (isLocked) {
+                    lockHtml = '<div style="position:absolute; top:10px; right:10px; font-size:1.5rem; z-index:5;">🔒</div>';
+                }
+
+                // İçerik gizliliği: Kilitliyse içeriği HTML'e bile koyma (Meraklı gözler için)
+                const backContent = isLocked ? 
+                    `<h3>???</h3>
+                     <div class="gift-icon">🔒</div>
+                     <p style="font-size: 0.9rem;">Zamanı gelince...</p>` : 
+                    `<h3>${day.title}</h3>
+                     <div class="gift-icon">${day.icon}</div>
+                     <button onclick="event.stopPropagation(); openModal(${day.id})">Oku</button>`;
+
+                card.innerHTML = `
+                    <div class="gift-card-inner">
+                        <div class="gift-front">
+                            ${lockHtml}
+                            <div class="ribbon-vertical"></div>
+                            <div class="ribbon-horizontal"></div>
+                            <div class="bow">🎀</div>
+                            <div class="day-number">${day.id}</div>
+                            ${isLocked ? '<div style="position:absolute; bottom:50px; color:white; font-size:0.8rem; width:100%; text-shadow: 0 1px 2px black;">Sabret Aşkımmm</div>' : ''}
+                        </div>
+                        <div class="gift-back">
+                            ${backContent}
+                        </div>
+                    </div>
+                `;
+
+                if(!isLocked) {
+                    card.onclick = (e) => {
+                        // Prevent triggering if clicking the button inside
+                        if(e.target.tagName === 'BUTTON') return;
+                        
+                        card.classList.toggle('opened');
+                        if(!openedDays.includes(day.id)) {
+                            openedDays.push(day.id);
+                            localStorage.setItem('openedDays_v2', JSON.stringify(openedDays));
+                        }
+                    };
+                } else {
+                    card.classList.add('locked');
+                    card.onclick = () => {
+                        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+                        alert("Bu hediye henüz açılamaz! Sabırlı ol sevgilim 💖\n\nAçılma Tarihi: " + unlockDate.toLocaleDateString('tr-TR', options));
+                    }
+                }
+
+                grid.appendChild(card);
+            });
+        }
+
+        function openModal(id) {
+            const day = days.find(d => d.id === id);
+            document.getElementById('modalIcon').innerText = day.icon;
+            document.getElementById('modalTitle').innerText = day.title;
+            document.getElementById('modalText').innerText = day.message;
+            document.getElementById('modal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.remove('active');
+        }
+
+        init();
+    </script>
+</body>
+</html>
